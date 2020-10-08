@@ -2,7 +2,7 @@
 The program the host an entire ecosystem
 
 
-8/10/2020:
+<b>8/10/2020:</b>
 1. clases for animal and plants
 2. impliment a* algorithm for animals to move around and consume plants for energy. 
 3. animals die after losing too much energy (stamina < 0)
