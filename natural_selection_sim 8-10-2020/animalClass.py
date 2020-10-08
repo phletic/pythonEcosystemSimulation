@@ -4,7 +4,11 @@ from vectorMath import Vector
 import sys
 import random
 
-
+'''
+This progam will store all the animal classes.
+I hope I will be able to allow the user to create his own organisms with custom behavious AKA edit the program through a UI
+'''
+#This Node is for the a* algorithm. THe Repr method is pretty useless as I wouldn't print it but still I guess no harm keeping...
 class Node():
     def __init__(self, v, f):
         self.v = v
@@ -13,7 +17,7 @@ class Node():
     def __repr__(self):
         return f"{self.v},{self.f}"
 
-
+#animal class. the parent
 class animalClass(ABC):
     def __init__(self, pos, stamina):
         self.pos = pos
@@ -22,6 +26,7 @@ class animalClass(ABC):
         self.type = ""
         self.stamina = stamina
 
+    #That one annoying a star program
     def aStar(self, end, obstacle):
         start = Node(self.pos, 0)
         open = [start]
@@ -82,11 +87,11 @@ class animalClass(ABC):
     def die(self,map):
         map.remove(self)
         return map
-
+#Prey class, the child. But soon I want to make it that there will be animals branching out from this class
 class prey(animalClass):
     def start(self):
         self.type = "prey"
-
+    # gets shortest path
     def calculate(self, map, types, locations):
         shortestDistance, plant = sys.maxsize, 0
         for e, i in enumerate(map):
@@ -136,4 +141,6 @@ class prey(animalClass):
                     #there is an obstruction
                     map = self.calculate(map, types, locations)
                     return map
+                
+#TODO predator 
 
