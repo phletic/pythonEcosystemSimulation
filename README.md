@@ -14,7 +14,6 @@ The program the host an entire ecosystem
 2. realised I was dumb in not using the super() function in the init function of child. changed that
 
 Diver program : map.py
-Diver program : map.py
 
 Current controls:
 
