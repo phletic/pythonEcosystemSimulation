@@ -7,7 +7,11 @@ import math
 
 '''
 This progam will store all the animal classes.
+
 I hope I will be able to allow the user to create his own organisms with custom behavious AKA edit the program through a UI
+
+code by Chavez Chen
+created on 8/10/2020 
 '''
 
 
