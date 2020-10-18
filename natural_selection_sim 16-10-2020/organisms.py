@@ -59,8 +59,18 @@ class organisms(ABC):
 # animal class. the parent
 class animal(organisms):
 
+    '''
+
+    animals: Rules: When it run the move() function, it picks out all organisms in the area within its vision. If
+    there is another organism of differing gender, it will check if its expectations > other species attractiveness
+    and vice versa. When both conditions pass, it will mate
+
+    '''
     # noinspection PyCompatibility
-    def __init__(self, pos, energy, growthRate, attractiveness, expectations, vision, species: str, foodEat, gender):
+    def __init__(self, pos, energy, growthRate, attractiveness, expectations, vision, species: str, foodEat, gender,
+                 notMate=None):
+        if notMate is None:
+            notMate = []
         self.wait = False
         self.gender = gender
         self.currentPath = []
@@ -68,6 +78,7 @@ class animal(organisms):
         self.expectations = expectations
         self.foodEat = foodEat
         self.attractiveness = attractiveness
+        self.notMate = notMate
         super().__init__(pos, energy, growthRate, vision, species, "animal")
 
     # That one annoying a star program
@@ -128,28 +139,39 @@ class animal(organisms):
             close.append(q)
             _open.pop(index)
             total += 1
-
+    def reproduce(self,_map,partner):
+        # since B < A, I will play dirty to do sth horrendous
+        # This code determine the stats of the baby
+        # the creature will not mate with the immediate parents
+        newEnergy = random.randint(self.energy, partner.energy) if partner.energy > self.energy else random.randint(
+            partner.energy, self.energy)
+        newGrowthRate = random.randint(self.growthRate,
+                                       partner.growthRate) if partner.growthRate > self.growthRate else random.randint(
+            partner.growthRate, self.growthRate)
+        newAttractivness = random.randint(self.attractiveness,
+                                          partner.attractiveness) if partner.attractiveness > self.attractiveness else random.randint(
+            partner.attractiveness, self.attractiveness)
+        newExpectations = random.randint(self.expectations,
+                                         partner.expectations) if partner.expectations > self.expectations else random.randint(
+            partner.expectations, self.expectations)
+        newVision = random.randint(self.vision, partner.vision) if partner.vision > self.vision else random.randint(
+            partner.vision, self.vision)
+        newGender = random.choice(["M", "F"])
+        # todo make sure pos is in a empty location. I'm not sure how I am solving this
+        Baby = animal(Vector(self.pos.x + 1, self.pos.y + 1), newEnergy, newGrowthRate,
+                      newAttractivness, newExpectations, newVision, self.species, self.foodEat,
+                      newGender, notMate=[self, partner])
+        self.notMate.append(partner)
+        _map.append(Baby)
+        return _map
     def go(self, vision, _map):
         newPos = self.currentPath[self.indexInCurrentPath]
         for i in vision:
             if i.pos == newPos:
                 if i.species == self.species:
-                    if i.gender is not self.gender and self.expectations >= i.attractiveness and i.check(self) == True:
-                        print("mate", self, i)
-                        # since B < A, I will play dirty to do sth horrendous
-                        # This code determine the stats of the baby
-                        newEnergy = random.randint(self.energy, i.energy) if i.energy > self.energy else random.randint(i.energy,self.energy)
-                        newGrowthRate = random.randint(self.growthRate,i.growthRate) if i.growthRate > self.growthRate else random.randint(i.growthRate,self.growthRate)
-                        # todo prevent incest
-                        newAttractivness = random.randint(self.attractiveness, i.attractiveness) if i.attractiveness > self.attractiveness else random.randint(i.attractiveness,self.attractiveness)
-                        newExpectations = random.randint(self.expectations, i.expectations) if i.expectations > self.expectations else random.randint(i.expectations,self.expectations)
-                        newVision = random.randint(self.vision, i.vision) if i.vision > self.vision else random.randint(i.vision,self.vision)
-                        newGender = random.choice(["M", "F"])
-                        #todo make sure pos is in a empty location. I'm not sure how I am solving this
-                        Baby = animal(Vector(self.pos.x + 1, self.pos.y + 1), newEnergy, newGrowthRate,
-                                      newAttractivness, newExpectations, newVision, self.species, self.foodEat,
-                                      newGender)
-                        _map.append(Baby)
+                    if i.gender is not self.gender and self.expectations >= i.attractiveness and i.check(self) is True \
+                            and i not in self.notMate:
+                        _map = self.reproduce(_map,i)
                         break
                 if i.species in self.foodEat:
                     print("eat")
@@ -173,6 +195,7 @@ class animal(organisms):
         return _map
 
     def move(self, _map):
+        #todo add check if organism can mate before making the move
         self.age += self.growthRate
         if self.age > 100:
             _map = self.die(_map)
@@ -239,7 +262,7 @@ class plant(organisms):
         return _map
 
 
-#to be implimented in other script
+# to be implimented in other script
 rabbit = animal(Vector(2, 2), 100, 1, 10, 10, 10, "rabbit", ["carrot"], "M")
 anotherRabbit = animal(Vector(2, 10), 100, 1, 10, 10, 10, "rabbit", ["carrot"], "F")
 _map = [rabbit, anotherRabbit]
